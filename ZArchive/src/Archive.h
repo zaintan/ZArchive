@@ -41,7 +41,7 @@
     inline bool UnSerialize(typ& x) {  \
         typ readx; \
         bool ret = readNumber(readx, ArchiveTag::eTag##typ); \
-        x = ByteOrder::IsLittleEndian() ? static_cast<##typ>(ByteOrder::SwapU##typ(static_cast<U##typ>(x))) : x; \
+        x = ByteOrder::IsLittleEndian() ? static_cast<##typ>(ByteOrder::SwapU##typ(static_cast<U##typ>(readx))) : readx; \
         return ret;\
     }\
 
@@ -101,13 +101,14 @@ namespace ZArchive
         UNSERIALIZE_BYTE_ORDER_TYPE(Float32);
         SERIALIZE_BYTE_ORDER_TYPE(Float64);
         UNSERIALIZE_BYTE_ORDER_TYPE(Float64);
-
         SERIALIZE_BYTE_ORDER_TYPE_EX(Int16);
         UNSERIALIZE_BYTE_ORDER_TYPE_EX(Int16);
         SERIALIZE_BYTE_ORDER_TYPE_EX(Int32);
         UNSERIALIZE_BYTE_ORDER_TYPE_EX(Int32);
         SERIALIZE_BYTE_ORDER_TYPE_EX(Int64);
         UNSERIALIZE_BYTE_ORDER_TYPE_EX(Int64);
+
+
 
         bool WriteTag(ArchiveTag tag);
         bool ReadAndCheckTag(ArchiveTag expectTag);

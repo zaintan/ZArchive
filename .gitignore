@@ -29,3 +29,13 @@
 # Executables
 *.out
 *.app
+
+# vs folder and solution files
+*.sln
+*.vcxproj
+*.vcxproj.user
+
+bin-int/
+bin/
+.vs/
+enc_temp_folder/

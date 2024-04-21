@@ -20,10 +20,10 @@ int main(int argc, char** argv)
     std::set<char> five = { 'a', 'b', 'o' };
     std::map<int, std::string> six =  { {1,"111"}, {2, "222"} };
     std::unordered_map<int, std::string> se = { {3,"333"}, {4, "4444"} };
-    tool.Serialize(first);
-    tool.Serialize(second);
+    ////tool.Serialize(first);
+    ////tool.Serialize(second);
     tool.Serialize(third);
-    tool.Serialize(four);
+    ////tool.Serialize(four);
     //tool.Serialize(five);
     //tool.Serialize(six);
     //tool.Serialize(se);
@@ -36,10 +36,10 @@ int main(int argc, char** argv)
         std::map<int, std::string> u6;
         std::unordered_map<int, std::string> u7;
 
-        tool.UnSerialize(u1);
-        tool.UnSerialize(u2);
+        ////tool.UnSerialize(u1);
+        ////tool.UnSerialize(u2);
         tool.UnSerialize(u3);
-        tool.UnSerialize(u4);
+        ////tool.UnSerialize(u4);
         //tool.UnSerialize(u5);
         //tool.UnSerialize(u6);
        // tool.UnSerialize(u7);
