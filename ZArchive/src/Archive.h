@@ -26,7 +26,7 @@
     inline bool UnSerialize(typ& x) {  \
         typ readx; \
         bool ret = readNumber(readx, ArchiveTag::eTag##typ); \
-        x = ByteOrder::IsLittleEndian() ? ByteOrder::Swap##typ(x) : x; \
+        x = ByteOrder::IsLittleEndian() ? ByteOrder::Swap##typ(readx) : readx; \
         return ret;\
     }\
 
@@ -67,12 +67,12 @@ namespace ZArchive
         void UnSerializeBegin(Stream* s, bool usingTag);
         void UnSerializeEnd();
 
-        template<typename T>
+        template<class T>
         bool Serialize(const T& obj) {
             return ArchiveHelper::Serialize(this, obj);
         }
 
-        template<typename T>
+        template<class T>
         bool UnSerialize(T& obj) {
             return ArchiveHelper::UnSerialize(this, obj);
         }

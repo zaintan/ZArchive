@@ -4,46 +4,78 @@
 #include "ArchiveSTL.h"
 #include <string>
 
+#include <assert.h>
 //#pragma comment(lib, "ZArchive.lib")
+
+template<class T>
+bool test(ZArchive::Archive& tool, ZArchive::Stream* buffer, const T& v)
+{
+    buffer->Seek(0);
+    tool.SerializeBegin(buffer, true);
+    tool.Serialize(v);
+    tool.SerializeEnd();
+
+    T other;
+    buffer->Seek(0);
+    tool.UnSerializeBegin(buffer, true);
+    tool.UnSerialize(other);
+    tool.UnSerializeEnd();
+
+    assert(other == v);
+    return other == v;
+}
+
 
 int main(int argc, char** argv)
 {
     ZArchive::BufferStream buffer;
-
     ZArchive::Archive tool;
-    tool.SerializeBegin(&buffer, true);
 
-    int first = 0x1;
-    short second = 0x2;
-    float third = 0.01f; 
-    std::vector<int> four = {1,2,3,4,5};
-    std::set<char> five = { 'a', 'b', 'o' };
-    std::map<int, std::string> six =  { {1,"111"}, {2, "222"} };
-    std::unordered_map<int, std::string> se = { {3,"333"}, {4, "4444"} };
-    ////tool.Serialize(first);
-    ////tool.Serialize(second);
-    tool.Serialize(third);
-    ////tool.Serialize(four);
-    //tool.Serialize(five);
-    //tool.Serialize(six);
-    //tool.Serialize(se);
-    tool.SerializeEnd();
+    Int8 v1   = -0x01;
+    UInt8 v2  = 0x01;
+    Int16 v3  = -0x0102;
+    UInt16 v4 = 0x0102;
+  
+    Int32 v5  = -0x01020304;
+    UInt32 v6 = 0x01020304;
+    Int64 v7  = -0x0102030405060708;
+    UInt64 v8 = 0x0102030405060708;
 
-    buffer.Seek(0);
-    tool.UnSerializeBegin(&buffer, true);
-    {
-        int u1; short u2; float u3; std::vector<int> u4; std::set<char> u5;
-        std::map<int, std::string> u6;
-        std::unordered_map<int, std::string> u7;
+    Float32 v9  = 0.123456f;
+    Float64 v10 = 0.123456789;
+    //base
+    test(tool, &buffer, v1);
+    test(tool, &buffer, v2);
+    test(tool, &buffer, v3);
+    test(tool, &buffer, v4);
+    test(tool, &buffer, v5);
+    test(tool, &buffer, v6);
+    test(tool, &buffer, v7);
+    test(tool, &buffer, v8);
+    test(tool, &buffer, v9);
+    test(tool, &buffer, v10);
+    
+    std::string v11 = "abcdefg";
+    std::vector<int> v13 = { 1,2,3,4,5 };
+    test(tool, &buffer, v11);
+    test(tool, &buffer, v13);
 
-        ////tool.UnSerialize(u1);
-        ////tool.UnSerialize(u2);
-        tool.UnSerialize(u3);
-        ////tool.UnSerialize(u4);
-        //tool.UnSerialize(u5);
-        //tool.UnSerialize(u6);
-       // tool.UnSerialize(u7);
-        tool.UnSerializeEnd();
-    }
+    std::list<int> v12 = { 1,2,3 };
+    std::deque<int> v17 = { 1,2,3 };
+    std::vector<std::vector<int>> v18= { {1},{1,2},{1,2,3} };
+
+    test(tool, &buffer, v12);
+    test(tool, &buffer, v17);
+    test(tool, &buffer, v18);
+
+    std::pair<int, std::string> v19 = { 0, "abc" };
+    test(tool, &buffer, v19);
+
+    std::set<char> v14 = { 'a', 'b', 'o' };
+    std::map<int, std::string> v15 = { {1,"111"}, {2, "222"} };
+    //std::unordered_map<int, std::string> v16 = { {3,"333"}, {4, "4444"} };
+    //////////////////////////////////////////////////
+    //test(tool, &buffer, v14);
+
     return 0;
 }
