@@ -1,30 +1,31 @@
 #include "BufferStream.h"
-#include <memory>
+#include "Macro.h"
 
 namespace ZArchive {
 
-    BufferStream::BufferStream(UInt32 initSize/* = 1024*/)
-        : m_size (initSize)
+    BufferStream::BufferStream(UInt32 initCapacity/* = 1024*/)
+        : m_Capacity(initCapacity)
     {
-        if (m_size > 0) {
-            m_data = malloc(m_size);
+        if (m_Capacity > 0) {
+            m_data = ZA_MALLOC(m_Capacity);
         }
     }
 
     BufferStream::~BufferStream()
     {
-        resize(0);
+        clear();
     }
 
     bool BufferStream::WriteBytes(const void* buffer, UInt32 size)
     {
-        if (m_cursor + size > m_size) {
-            bool ret = resize( m_size == 0 ? 1024 :(UInt32)(m_size * 1.5f) );
+        if (m_cursor + size > m_Capacity) {
+            bool ret = reCapacity(m_Capacity == 0 ? 1024 :(UInt32)(m_Capacity * 1.5f) );
             if (!ret) return false;
         }
 
         memcpy((void*)((UInt8*)m_data + m_cursor), buffer, size);
         m_cursor += size;
+        m_size = m_cursor;
         return true;
     }
 
@@ -38,29 +39,25 @@ namespace ZArchive {
         return true;
     }
 
-    //bool BufferStream::Seek(UInt32 pos)
-    //{
+  
 
-    //}
-
-    bool BufferStream::resize(UInt32 dstSize)
+    bool BufferStream::reCapacity(UInt32 dstCapacity)
     {
-        if (dstSize == m_size) return true;
-
-        if (dstSize == 0) {
-            if(m_data)
-                free(m_data);
-            m_data = nullptr;
-            m_size = 0;
-            return true;
+        if (dstCapacity == 0) {//do nothing
+            return false;
         }
-
-        void* data = malloc(dstSize);
-        if (!data) return false;
-        resize(0);
+        void* data = ZA_REALLOC(m_data, dstCapacity);
+        if (!data)
+            return false;
         m_data = data;
-        m_size = dstSize;
-        m_cursor = m_cursor > m_size ? m_size : m_cursor;
+        m_Capacity = dstCapacity;
         return true;
+    }
+
+    void BufferStream::clear()
+    {
+        ZA_FREE(m_data);
+        m_data = nullptr;
+        m_Capacity = 0;
     }
 }

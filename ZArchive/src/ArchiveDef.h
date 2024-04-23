@@ -23,11 +23,13 @@ namespace ZArchive {
         eTagSTLList,
         eTagSTLDeque,
 
-        eTagPair,
-        eTagSTLMap,
+        eTagSTLPair,
         eTagSTLSet,
-        eTagSTLUnOrderedMap,
+        eTagSTLMultiSet,
         eTagSTLUnOrderedSet,
+        eTagSTLMap,
+        eTagSTLMultiMap,
+        eTagSTLUnOrderedMap,
 
         eTagEnd
     };

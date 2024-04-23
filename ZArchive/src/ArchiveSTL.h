@@ -8,8 +8,8 @@
 #include <deque>
 #include <map>
 #include <set>
-//#include <unordered_map>
-//#include <unordered_set>
+#include <unordered_map>
+#include <unordered_set>
 #include <iterator>
 
 namespace ZArchive {
@@ -93,73 +93,103 @@ namespace ZArchive {
         //pair
         template<class T1, class T2>
         bool Serialize(Archive* archive, const std::pair<T1, T2>& obj) {
-            return archive->WriteTag(ArchiveTag::eTagPair)
+            return archive->WriteTag(ArchiveTag::eTagSTLPair)
                 && archive->Serialize(obj.first)
                 && archive->Serialize(obj.second);
         }
 
         template<class T1, class T2>
         bool UnSerialize(Archive* archive, std::pair<T1, T2>& obj) {
-            return archive->ReadAndCheckTag(ArchiveTag::eTagPair)
+            return archive->ReadAndCheckTag(ArchiveTag::eTagSTLPair)
                 && archive->UnSerialize(obj.first)
                 && archive->UnSerialize(obj.second);
         }
 
-        ////map
-        //template<typename TKEY, typename TVAL, typename TCOMPARE>
-        //bool Serialize(Archive* archive, const std::map<TKEY, TVAL, TCOMPARE>& obj) {
-        //    return archive->WriteTag(ArchiveTag::eTagSTLMap)
-        //        && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
-        //}
-
-        //template<typename TKEY, typename TVAL, typename TCOMPARE>
-        //bool UnSerialize(Archive* archive, std::map<TKEY, TVAL, TCOMPARE>& obj) {
-        //    obj.clear();
-        //    return archive->ReadAndCheckTag(ArchiveTag::eTagSTLMap)
-        //        && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (std::pair<TKEY, TVAL>*)nullptr);
-        //}
-
-        ////unordered_map
-        //template<typename _Key, typename _Val, typename _Hash, typename _KeyEq>
-        //bool Serialize(Archive* archive, const std::unordered_map<_Key, _Val, _Hash, _KeyEq>& obj) {
-        //    return archive->WriteTag(ArchiveTag::eTagSTLUnOrderedMap)
-        //        && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
-        //}
-
-        //template<typename _Key, typename _Val, typename _Hash, typename _KeyEq>
-        //bool UnSerialize(Archive* archive, std::unordered_map<_Key, _Val, _Hash, _KeyEq>& obj) {
-        //    obj.clear();
-        //    return archive->ReadAndCheckTag(ArchiveTag::eTagSTLUnOrderedMap)
-        //        && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (std::pair<_Key, _Val>*)nullptr);
-        //}
-
-
         //set
         template<class T1, class T2>
-        bool Serialize(Archive* archive, const std::set<T1, T2> &obj) {
+        bool Serialize(Archive* archive, const std::set<T1, T2>& obj) {
             return archive->WriteTag(ArchiveTag::eTagSTLSet)
                 && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
         }
 
         template<class T1, class T2>
-        bool UnSerialize(Archive* archive, std::set<T1, T2> &obj) {
+        bool UnSerialize(Archive* archive, std::set<T1, T2>& obj) {
             obj.clear();
             return archive->ReadAndCheckTag(ArchiveTag::eTagSTLSet)
                 && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (T1*)nullptr);
         }
 
-        //unordered_set
-        //template<typename _Val, typename _Hash, typename _KeyEq>
-        //bool Serialize(Archive* archive, const std::unordered_set<_Val, _Hash, _KeyEq>& obj) {
-        //    return archive->WriteTag(ArchiveTag::eTagSTLUnOrderedSet)
-        //        && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
-        //}
+        //multiset
+        template<class T1, class T2>
+        bool Serialize(Archive* archive, const std::multiset<T1, T2>& obj) {
+            return archive->WriteTag(ArchiveTag::eTagSTLMultiSet)
+                && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
+        }
 
-        //template<typename _Val, typename _Hash, typename _KeyEq>
-        //bool UnSerialize(Archive* archive, std::unordered_set<_Val, _Hash, _KeyEq>& obj) {
-        //    obj.clear();
-        //    return archive->ReadAndCheckTag(ArchiveTag::eTagSTLUnOrderedSet)
-        //        && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (_Val*)nullptr);
-        //}
+        template<class T1, class T2>
+        bool UnSerialize(Archive* archive, std::multiset<T1, T2>& obj) {
+            obj.clear();
+            return archive->ReadAndCheckTag(ArchiveTag::eTagSTLMultiSet)
+                && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (T1*)nullptr);
+        }
+
+        //unordered_set
+        template<typename T, typename HASH, typename EQ>
+        bool Serialize(Archive* archive, const std::unordered_set<T, HASH, EQ>& obj) {
+            return archive->WriteTag(ArchiveTag::eTagSTLUnOrderedSet)
+                && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
+        }
+
+        template<typename T, typename HASH, typename EQ>
+        bool UnSerialize(Archive* archive, std::unordered_set<T, HASH, EQ>& obj) {
+            obj.clear();
+            return archive->ReadAndCheckTag(ArchiveTag::eTagSTLUnOrderedSet)
+                && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (T*)nullptr);
+        }
+
+        //map
+        template<typename TKEY, typename TVAL, typename TCOMPARE>
+        bool Serialize(Archive* archive, const std::map<TKEY, TVAL, TCOMPARE>& obj) {
+            return archive->WriteTag(ArchiveTag::eTagSTLMap)
+                && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
+        }
+
+        template<typename TKEY, typename TVAL, typename TCOMPARE>
+        bool UnSerialize(Archive* archive, std::map<TKEY, TVAL, TCOMPARE>& obj) {
+            obj.clear();
+            return archive->ReadAndCheckTag(ArchiveTag::eTagSTLMap)
+                && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (std::pair<TKEY, TVAL>*)nullptr);
+        }
+
+        //multimap
+        template<typename TKEY, typename TVAL, typename TCOMPARE>
+        bool Serialize(Archive* archive, const std::multimap<TKEY, TVAL, TCOMPARE>& obj) {
+            return archive->WriteTag(ArchiveTag::eTagSTLMultiMap)
+                && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
+        }
+
+        template<typename TKEY, typename TVAL, typename TCOMPARE>
+        bool UnSerialize(Archive* archive, std::multimap<TKEY, TVAL, TCOMPARE>& obj) {
+            obj.clear();
+            return archive->ReadAndCheckTag(ArchiveTag::eTagSTLMultiMap)
+                && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (std::pair<TKEY, TVAL>*)nullptr);
+        }
+
+        //unordered_map
+        template<typename TKEY, typename TVAL, typename HASH, typename EQ>
+        bool Serialize(Archive* archive, const std::unordered_map<TKEY, TVAL, HASH, EQ>& obj) {
+            return archive->WriteTag(ArchiveTag::eTagSTLUnOrderedMap)
+                && SerializeContainer(archive, obj.begin(), obj.end(), obj.size());
+        }
+
+        template<typename TKEY, typename TVAL, typename HASH, typename EQ>
+        bool UnSerialize(Archive* archive, std::unordered_map<TKEY, TVAL, HASH, EQ>& obj) {
+            obj.clear();
+            return archive->ReadAndCheckTag(ArchiveTag::eTagSTLUnOrderedMap)
+                && UnSerializeContainer(archive, std::inserter(obj, obj.end()), (std::pair<TKEY, TVAL>*)nullptr);
+        }
+
+
+
     };
 };

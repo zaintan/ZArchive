@@ -4,44 +4,53 @@
 
 namespace ZArchive {
 
-    void Archive::SerializeBegin(Stream* s, bool usingTag)
+    bool Archive::SerializeBegin(Stream* s, bool usingTag)
     {
-        ZA_ASSERT(m_curState == ArchiveState::None);
-        ZA_ASSERT(m_stream == nullptr);
-        ZA_ASSERT(s != nullptr);
+        if (m_curState != ArchiveState::None
+            || s == nullptr
+            || m_stream != nullptr)
+            return false;
 
         m_stream   = s;
         m_usingTag = usingTag;
         m_curState = ArchiveState::Write;
+        return true;
     }
 
-    void Archive::SerializeEnd()
+    bool Archive::SerializeEnd()
     {
-        ZA_ASSERT(m_curState == ArchiveState::Write);
-        ZA_ASSERT(m_stream != nullptr);
+        if (m_curState != ArchiveState::Write
+            || m_stream == nullptr)
+            return false;
 
         m_stream   = nullptr;
         m_curState = ArchiveState::None;
+        return true;
     }
 
-    void Archive::UnSerializeBegin(Stream* s, bool usingTag)
+    bool Archive::UnSerializeBegin(Stream* s, bool usingTag)
     {
-        ZA_ASSERT(m_curState == ArchiveState::None);
-        ZA_ASSERT(m_stream == nullptr);
-        ZA_ASSERT(s != nullptr);
+        if (m_curState != ArchiveState::None
+            || s == nullptr
+            || m_stream != nullptr)
+            return false;
+
 
         m_stream   = s;
         m_usingTag = usingTag;
         m_curState = ArchiveState::Read;
+        return true;
     }
 
-    void Archive::UnSerializeEnd()
+    bool Archive::UnSerializeEnd()
     {
-        ZA_ASSERT(m_curState == ArchiveState::Read);
-        ZA_ASSERT(m_stream != nullptr);
+        if (m_curState != ArchiveState::Read
+            || m_stream == nullptr)
+            return false;
 
         m_stream   = nullptr;
         m_curState = ArchiveState::None;
+        return true;
     }
 
     
@@ -119,5 +128,24 @@ namespace ZArchive {
     bool Archive::UnSerializeCount(UInt32& cnt)
     {
         return readNumber(cnt, ArchiveTag::eTagUInt32);
+    }
+
+    bool Archive::SerializeRawData(const void* data, UInt32 bytes)
+    {
+        if (!WriteTag(ArchiveTag::eTagRawBytes)) return false;
+        if (!SerializeCount(bytes)) return false;
+        return writeBytes(data, bytes);
+    }
+
+    bool Archive::UnSerializeRawData(void*& data, UInt32& bytes)
+    {
+        data = nullptr;
+        if (!ReadAndCheckTag(ArchiveTag::eTagRawBytes)) return false;
+        if (!UnSerializeCount(bytes)) return false;
+        if (bytes > 0) {
+            data = ZA_MALLOC(bytes);
+            return readBytes(data, bytes);
+        }
+        return true;
     }
 }

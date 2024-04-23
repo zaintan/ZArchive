@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseType.h"
-//#include "Macro.h"
+#include "Macro.h"
 #include "ArchiveDef.h"
 #include "ByteOrder.h"
 #include <string>
@@ -62,10 +62,10 @@ namespace ZArchive
         Archive(Archive&& arc) = delete;
         Archive& operator=(Archive&& arc) = delete;
 
-        void SerializeBegin(Stream* s, bool usingTag);
-        void SerializeEnd();
-        void UnSerializeBegin(Stream* s, bool usingTag);
-        void UnSerializeEnd();
+        bool SerializeBegin(Stream* s, bool usingTag);
+        bool SerializeEnd();
+        bool UnSerializeBegin(Stream* s, bool usingTag);
+        bool UnSerializeEnd();
 
         template<class T>
         bool Serialize(const T& obj) {
@@ -80,6 +80,45 @@ namespace ZArchive
 
         bool SerializeCount(UInt32 cnt);
         bool UnSerializeCount(UInt32& cnt);
+
+        template<class T>
+        bool SerializeArray(const T* objArr, UInt32 nums) {
+            if (nums == 0 || objArr == nullptr) 
+                return true;
+            if (!WriteTag(ArchiveTag::eTagArray)) 
+                return false;
+            if (!SerializeCount(nums)) 
+                return false;
+            for (UInt32 i = 0; i < nums; i++) {
+                if (!Serialize(objArr[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        template<class T>
+        bool UnSerializeArray(T*& objArrPtr, UInt32& nums) {
+
+            objArrPtr = nullptr;
+            if (!ReadAndCheckTag(ArchiveTag::eTagArray))
+                return false;
+            if (!UnSerializeCount(nums))
+                return false;
+            
+            objArrPtr = (T*)(ZA_NEW_ARRAY(T, nums));
+
+            for (UInt32 i = 0; i < nums; i++) {
+                if (!UnSerialize(objArrPtr[i])) {
+                    return false;
+                }
+            }
+            return true;
+
+        }
+
+        bool SerializeRawData(const void* data, UInt32 bytes);
+        bool UnSerializeRawData(void* &data, UInt32& bytes);
 
         //基础类型支持
         bool Serialize(const char* str);
