@@ -11,7 +11,7 @@
 
 void Dump(ZArchive::Stream& buffer)
 {
-    buffer.ResetRead();
+    buffer.ResetReadPos(0);
     void* data = buffer.GetRawData();
     UInt32 size = buffer.GetAvailableReadSize();
     std::cout << "buffer size ["<< size<<"]:" << std::endl << "[";
@@ -39,14 +39,13 @@ void TestRawData(const void* data, UInt32 len, bool useTagging)
 
     Dump(buf);
     // read
-    void* readdata = nullptr;
-    UInt32 readlen = 0;
+    void* readdata = ZA_MALLOC(len);
+
     assert(s.UnSerializeBegin(&buf, useTagging));
-    assert(s.UnSerializeRawData(readdata, readlen));//need free memory
+    assert(s.UnSerializeRawData(readdata, len));//need free memory
     assert(s.UnSerializeEnd());
 
     assert(readdata != nullptr);
-    assert(readlen == len);
 
     const UInt8* data_orgin = (const UInt8*)data;
     const UInt8* data_read = (const UInt8*)readdata;
@@ -64,7 +63,7 @@ bool TestSingleObject(const T& v, bool useTagging)
     ZArchive::Archive tool;
     ZArchive::BufferStream buffer;
 
-    buffer.ResetWrite();
+    buffer.ResetWritePos(0);
     assert(tool.SerializeBegin(&buffer, useTagging));
     assert(tool.Serialize(v));
     assert(tool.SerializeEnd());
@@ -72,7 +71,7 @@ bool TestSingleObject(const T& v, bool useTagging)
     Dump(buffer);
 
     T other;
-    buffer.ResetRead();
+    buffer.ResetReadPos(0);
     assert(tool.UnSerializeBegin(&buffer, useTagging));
     assert(tool.UnSerialize(other));
     assert(tool.UnSerializeEnd());
@@ -241,9 +240,24 @@ void test_stl(bool useTagging)
     }
 }
 
-void test_buffer(bool useTagging)
+void test_stream(bool useTagging)
 {
-    std::cout << "======buffer:======" << std::endl;
+    std::cout << "======buffer stream:======" << std::endl;
+
+    //std::cout << "origin:"<< v << std::endl;
+
+    ZArchive::Archive tool;
+    ZArchive::BufferStream buffer;
+
+    //buffer.ResetWrite();
+    assert(tool.SerializeBegin(&buffer, useTagging));
+    assert(tool.Serialize("hello world!"));
+    assert(tool.Serialize(UInt32(0x01020304)));
+    assert(tool.SerializeCount(0x100));
+    assert(tool.SerializeEnd());
+    Dump(buffer);
+
+    TestSingleObject(buffer, useTagging);
 }
 
 void test_custom(bool useTagging)
@@ -271,7 +285,7 @@ int main(int argc, char** argv)
 
     test_array(useTagging);
 
-    test_buffer(useTagging);
+    test_stream(useTagging);
 
     test_stl(useTagging);
 

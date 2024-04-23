@@ -118,7 +118,7 @@ namespace ZArchive
         }
 
         bool SerializeRawData(const void* data, UInt32 bytes);
-        bool UnSerializeRawData(void* &data, UInt32& bytes);
+        bool UnSerializeRawData(void* data, UInt32 bytes);
 
         //基础类型支持
         bool Serialize(const char* str);

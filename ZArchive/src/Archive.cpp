@@ -133,19 +133,14 @@ namespace ZArchive {
     bool Archive::SerializeRawData(const void* data, UInt32 bytes)
     {
         if (!WriteTag(ArchiveTag::eTagRawBytes)) return false;
-        if (!SerializeCount(bytes)) return false;
+        //if (!SerializeCount(bytes)) return false;
         return writeBytes(data, bytes);
     }
 
-    bool Archive::UnSerializeRawData(void*& data, UInt32& bytes)
+    bool Archive::UnSerializeRawData(void* data, UInt32 bytes)
     {
-        data = nullptr;
         if (!ReadAndCheckTag(ArchiveTag::eTagRawBytes)) return false;
-        if (!UnSerializeCount(bytes)) return false;
-        if (bytes > 0) {
-            data = ZA_MALLOC(bytes);
-            return readBytes(data, bytes);
-        }
-        return true;
+        //if (!UnSerializeCount(bytes)) return false;
+        return readBytes(data, bytes);
     }
 }

@@ -1,6 +1,23 @@
 #pragma once
 
+#define ARCHIVE_DECLARE_SERIALIZE(typ) \
+    namespace ZArchive{ \
+        namespace ArchiveHelper { \
+            bool Serialize(Archive* , const typ& ); \
+            bool UnSerialize(Archive* , typ& ); \
+        }\
+    }\
+
+#define ARCHIVE_DECLARE_FRIEND(typ) \
+    friend bool ZArchive::ArchiveHelper::Serialize(Archive*, const typ&); \
+    friend bool ZArchive::ArchiveHelper::UnSerialize(Archive*, typ&)
+
+#define ARCHIVE_IMPLEMENT_SERIALIZE(typ) bool ZArchive::ArchiveHelper::Serialize(Archive* ar, const typ& obj)
+#define ARCHIVE_IMPLEMENT_UNSERIALIZE(typ) bool ZArchive::ArchiveHelper::UnSerialize(Archive* ar, typ& obj)  
+
 namespace ZArchive {
+    class Archive;
+    namespace ArchiveHelper {};
 
     enum class ArchiveTag
     {
@@ -18,6 +35,7 @@ namespace ZArchive {
         eTagString,
         eTagArray,
         eTagRawBytes,
+        eTagStream,
         //stl
         eTagSTLVector,
         eTagSTLList,
@@ -33,7 +51,5 @@ namespace ZArchive {
 
         eTagEnd
     };
-
-
-    
 }
+  
